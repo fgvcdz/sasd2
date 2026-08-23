@@ -44,16 +44,22 @@ function del() {
 <template>
     <Head :title="a.title" />
     <div class="container-fluid py-3 px-4">
-        <div class="admin-toolbar mb-3">
-            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
-                <div>
-                    <div class="toolbar-title"><i class="bi bi-box-seam me-2"></i>{{ a.title_short }}</div>
-                    <nav>
-                        <ol class="breadcrumb mb-0">
-                            <li class="breadcrumb-item"><Link :href="a.index_url" class="pf-breadcrumb-link">İlanlar</Link></li>
-                            <li class="breadcrumb-item active">Detay</li>
-                        </ol>
-                    </nav>
+        <div class="admin-toolbar au-show-head mb-3">
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="au-show-icon"><i class="bi bi-box-seam"></i></div>
+                    <div>
+                        <div class="d-flex align-items-center gap-2 flex-wrap">
+                            <div class="toolbar-title mb-0">{{ a.title_short }}</div>
+                            <span class="a-badge" :class="a.status_type">{{ a.status_label }}</span>
+                        </div>
+                        <nav>
+                            <ol class="breadcrumb mb-0 mt-1">
+                                <li class="breadcrumb-item"><Link :href="a.index_url" class="pf-breadcrumb-link">İlanlar</Link></li>
+                                <li class="breadcrumb-item active">Detay</li>
+                            </ol>
+                        </nav>
+                    </div>
                 </div>
                 <div class="d-flex gap-2 flex-wrap">
                     <template v-if="a.status === 'draft'">
@@ -70,8 +76,8 @@ function del() {
 
         <div class="row g-3">
             <div class="col-lg-7">
-                <div class="admin-card mb-3">
-                    <img :src="mainImg" class="w-100" style="height:360px;object-fit:contain;background:var(--bg);border-radius:16px;">
+                <div class="admin-card mb-3 p-2">
+                    <img :src="mainImg" class="w-100" style="height:340px;object-fit:contain;background:var(--bg-soft);border:1px solid var(--border);border-radius:12px;">
                     <div v-if="a.images.length > 1" class="d-flex gap-2 p-3" style="overflow-x:auto;">
                         <img v-for="(img, i) in a.images" :key="i" :src="img.url" @click="mainImg = img.url"
                              class="thumb-img" :class="{ 'thumb-active': mainImg === img.url }"
@@ -146,3 +152,27 @@ function del() {
         </div>
     </div>
 </template>
+
+<style scoped>
+.au-show-head {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 16px 18px;
+    box-shadow: var(--shadow);
+}
+.au-show-icon {
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #155eef 0%, #1e40af 100%);
+    color: #fff;
+    font-size: 1.35rem;
+    box-shadow: 0 6px 16px rgba(21, 94, 239, 0.35);
+}
+.au-show-head .toolbar-title { font-size: 1.15rem; }
+</style>

@@ -22,13 +22,18 @@
 #msg-list .msg-bubble.admin .msg-body { align-items: flex-end; display: flex; flex-direction: column; }
 
 /* --- Native <select> dark/light mode uyumu ---
-   Açılan seçenek listesi tarayıcı varsayılanıyla beyaz kalıyordu.
-   Tema değişkenleriyle her iki modda da okunur hale getir. */
-select.pf-input option,
-select.admin-filter-select option,
-.pf-field select option,
-.s-form select option,
-.ord-field select option {
-    background-color: var(--card);
+   Açılan seçenek listesi tarayıcı varsayılanıyla (beyaz sistem menüsü) kalıyordu.
+   var(--card) DARK modda yarı saydam (rgba) olduğundan beyaz görünüyordu.
+   Çözüm: SOLID var(--bg) + color-scheme (native popup temasını da düzeltir). */
+select {
+    color-scheme: dark;
+}
+html.light-mode select,
+body.light-mode select {
+    color-scheme: light;
+}
+select option,
+select optgroup {
+    background-color: var(--bg);
     color: var(--text);
 }

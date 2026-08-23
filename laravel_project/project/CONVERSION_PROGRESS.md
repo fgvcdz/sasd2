@@ -335,3 +335,7 @@ Kullanıcı isteği: Users index'te "Kullanıcı Ekle" butonu yoktu (Blade'de + 
 
 ## ▶️ KALAN (tek grup)
 - **GRUP 3 — Satıcı Canlı Yayın / WebRTC** (`BroadcastController@show` → `auctions.blade.php`, Reverb WebSocket bağımlı).
+
+## 🩹 Bug Fix Turu 2 (kullanıcı geri bildirimi) — TAMAM ✅ (testing agent %100, iteration_3)
+- **Dark mode native select okunabilirliği (KÖK ÇÖZÜM):** İlk düzeltmede `option` arkaplanı `var(--card)` idi; dark modda `--card` YARI SAYDAM (rgba) olduğundan native açılır listede beyaz görünüyordu. Çözüm: `admin-fixes.css`'te `select{color-scheme:dark}` + `html.light-mode select{color-scheme:light}` + `option{background:var(--bg);color:var(--text)}` (var(--bg) her iki modda da SOLID: #0b0d14 / #f4f6fb). Tüm admin CRUD selectlerinde (auction edit condition/status, support filtre, settings) seçenekler artık okunur.
+- **Admin İlan Göster derli toplu + ikon:** başlık artık kart tarzı header (`.au-show-head`) + solu mavi gradyan ikon rozeti (`.au-show-icon` içinde bi-box-seam) + durum rozeti başlığın yanında; görsel kartı sadeleştirildi.
