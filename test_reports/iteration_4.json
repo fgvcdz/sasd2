@@ -1,0 +1,26 @@
+{
+  "summary": "Visual verification of redesigned Admin Auction Show page (/admin/auctions/9). Header card .au-show-head renders the 52x52 blue gradient badge (.au-show-icon) with bi-box-seam icon clearly visible, title 'Antika Masa Saati ve Vazo Seti', 'Aktif' status pill next to title, 'İlanlar / Detay' breadcrumb below, and Düzenle/Sil buttons on the right. Image area (.au-show-img) is 300px tall, contained, bordered. Özet/Satıcı/Detaylar/Açıklama cards render tidy. Served bundle matches app-_qD7PWy5.js. No console errors related to the page (only unrelated 403 from a notifications resource).",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "verified_metrics": {
+    "au-show-icon": {"width": 52, "height": 52, "background": "linear-gradient(135deg, rgb(21,94,239), rgb(30,64,175))", "borderRadius": "14px", "glyph": "bi bi-box-seam", "glyphColor": "#fff", "glyphFontSize": "19.5px", "visible": true},
+    "au-show-img": {"height": 300, "objectFit": "contain", "border": "1px solid rgba(255,255,255,0.08)", "borderRadius": "12px"},
+    "bundle": "app-_qD7PWy5.js",
+    "status_pill_in_header": "Aktif",
+    "title": "Antika Masa Saati ve Vazo Seti",
+    "breadcrumb": "İlanlar / Detay"
+  },
+  "test_report_links": [],
+  "action_items": [],
+  "critical_code_review_comments": [],
+  "updated_files": [],
+  "success_rate": {"frontend": "100%"},
+  "seed_data_creation": "",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Auction show header redesign verified visually on desktop viewport (1440x900). Screenshot saved at .screenshots/auction_show_top.png."
+}

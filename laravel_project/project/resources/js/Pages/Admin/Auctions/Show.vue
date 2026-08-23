@@ -77,7 +77,7 @@ function del() {
         <div class="row g-3">
             <div class="col-lg-7">
                 <div class="admin-card mb-3 p-2">
-                    <img :src="mainImg" class="w-100" style="height:340px;object-fit:contain;background:var(--bg-soft);border:1px solid var(--border);border-radius:12px;">
+                    <img :src="mainImg" class="w-100 au-show-img">
                     <div v-if="a.images.length > 1" class="d-flex gap-2 p-3" style="overflow-x:auto;">
                         <img v-for="(img, i) in a.images" :key="i" :src="img.url" @click="mainImg = img.url"
                              class="thumb-img" :class="{ 'thumb-active': mainImg === img.url }"
@@ -155,15 +155,15 @@ function del() {
 
 <style scoped>
 .au-show-head {
-    background: var(--card);
+    background: linear-gradient(180deg, rgba(21,94,239,0.08) 0%, var(--card) 60%);
     border: 1px solid var(--border);
     border-radius: 16px;
-    padding: 16px 18px;
+    padding: 18px 20px;
     box-shadow: var(--shadow);
 }
 .au-show-icon {
-    width: 48px;
-    height: 48px;
+    width: 52px;
+    height: 52px;
     flex-shrink: 0;
     border-radius: 14px;
     display: flex;
@@ -171,8 +171,16 @@ function del() {
     justify-content: center;
     background: linear-gradient(135deg, #155eef 0%, #1e40af 100%);
     color: #fff;
-    font-size: 1.35rem;
-    box-shadow: 0 6px 16px rgba(21, 94, 239, 0.35);
+    font-size: 1.5rem;
+    box-shadow: 0 6px 18px rgba(21, 94, 239, 0.4);
 }
-.au-show-head .toolbar-title { font-size: 1.15rem; }
+.au-show-head .toolbar-title { font-size: 1.2rem; font-weight: 700; }
+.au-show-img {
+    height: 300px;
+    object-fit: contain;
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    display: block;
+}
 </style>
