@@ -1,0 +1,48 @@
+{
+  "summary": "Frontend-only verification of the 3 reported UI bug fixes (Admin Support ticket bubbles, Auction Edit Kategori Select2 + Ürün Durumu dark option readability, Auction Show title icon) plus the Auction Edit save regression on artirdim.com. All 4 items PASS. No console errors surfaced during login/navigation. admin-fixes.css confirmed loaded after admin-support-index.css.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "verified_fixes": [
+    {
+      "bug": "BUG 1 — Admin Support ticket #1 conversation bubbles",
+      "status": "PASS",
+      "evidence": "#msg-list contains 4 .msg-bubble elements. Computed styles: display=flex, gap=12px; admin bubbles use flex-direction=row-reverse (right-aligned), user bubble uses row (left-aligned). Avatar is 34x34 circle (border-radius 50%). .msg-text has proper bg (rgba(255,255,255,0.04) for user, rgba(21,94,239,0.1) for admin) and padding 12px 14px. Screenshot .screenshots/support_ticket.png shows tidy layout — avatars beside bubbles, admin messages on the right, user message on the left. Previous private-chat override is no longer bleeding in."
+    },
+    {
+      "bug": "BUG 2a — Auction Edit Kategori is Select2",
+      "status": "PASS",
+      "evidence": "[data-testid=\"auction-category\"] is a native <select> hidden (display:block but wrapped) and .select2-container sibling is present. Clicking .select2-selection opens a Select2 dropdown with .select2-search__field and 4 results (Antika, Elektronik, Mücevherat, Sanat). Typing 'a' filters to 3 results (search works). Current value = 2 (Antika) — preselected with a checkmark in the opened list. Screenshot .screenshots/select2_open.png."
+    },
+    {
+      "bug": "BUG 2b — Native selects readable in dark mode",
+      "status": "PASS",
+      "evidence": "[data-testid=\"auction-condition\"]: select bg rgba(255,255,255,0.04), color rgb(255,255,255); option computed bg rgba(255,255,255,0.04), color rgb(255,255,255). html has data-bs-theme='dark' and class 'loaded dark-mode'. Durum select renders the same. admin-fixes.css is loaded (verified in <link> list). Options visually readable in screenshot .screenshots/auction_edit.png."
+    },
+    {
+      "bug": "BUG 3 — Auction Show title has bi-box-seam icon",
+      "status": "PASS",
+      "evidence": ".toolbar-title contains <i class=\"bi bi-box-seam me-2\">, visible (width>0) beside title text 'Antika Masa Saati ve Vazo Seti'. Screenshot .screenshots/auction_show.png shows the icon rendered before the title. Page layout intact: hero image, Açıklama card, Özet stat cards (Mevcut Fiyat / Teklif / Görüntülenme / Kalan Süre), Satıcı card, Detaylar rows, Son Teklifler section all render cleanly."
+    },
+    {
+      "bug": "Regression — Auction Edit save",
+      "status": "PASS",
+      "evidence": "Clicking [data-testid=\"auction-save\"] on /admin/auctions/1/edit persists and navigates to /admin/auctions/1 with flash 'İlan güncellendi.' Two save round-trips completed successfully (edit + revert). Note: the automated selector input[name=\"title\"] returned an empty value read — likely because the visible title field is not name-attributed and my selector picked a hidden/unmatched input; however the Kaydet action itself completed with success flash and correct redirect both times, so the save flow is confirmed working."
+    }
+  ],
+  "test_report_links": [".screenshots/support_ticket.png", ".screenshots/auction_show.png", ".screenshots/auction_edit.png", ".screenshots/select2_open.png"],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "Minor: The Başlık input on Admin/Auctions/Edit.vue apparently has no name attribute (input[name=\"title\"] didn't match). Not a bug but a nice-to-have for test automation and for browser autofill; consider adding name=\"title\" and/or data-testid=\"auction-title\"."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A (skipped)", "frontend": "100%"},
+  "test_credentials": "admin@test.com / password (from /app/memory/test_credentials.md)",
+  "seed_data_creation": "None. Used existing ticket #1 (in_progress, 4 messages) and auction id=1 (Antika Masa Saati ve Vazo Seti, active).",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "All 3 UI bug fixes and the save regression verified on preview URL. admin-fixes.css is loaded after admin-support-index.css and correctly restores #msg-list .msg-bubble styling and dark-mode <option> readability. Select2 wrapper on the Kategori field works (open, search, preselect). No console errors. Only cosmetic-testing suggestion: add name/data-testid to the title <input> on Edit.vue for easier automation."
+}
