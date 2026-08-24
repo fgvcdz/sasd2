@@ -8,6 +8,8 @@
  |  - Profil sayfası .story-source DOM'undan da veri okur (fallback)
 */
 import { ref, computed, watch, onMounted, onBeforeUnmount, nextTick } from 'vue';
+import { router } from '@inertiajs/vue3';
+import { csrfHeaders } from '@/csrf';
 
 const IMG_DURATION = 5000;
 
@@ -15,8 +17,12 @@ const open = ref(false);
 const curUser = ref(null);
 const curIndex = ref(0);
 const ready = ref(false);
+const paused = ref(false);
 const mediaDuration = ref(IMG_DURATION);
+const videoRef = ref(null);
 let timer = null;
+let remaining = 0;
+let timerStart = 0;
 
 const u = computed(() => (curUser.value != null && window.STORY_DATA) ? window.STORY_DATA[curUser.value] : null);
 const item = computed(() => (u.value && u.value.items) ? u.value.items[curIndex.value] : null);
@@ -82,10 +88,34 @@ function refreshStorySources() {
 function clearTimer() { clearTimeout(timer); timer = null; }
 function startTimer() {
     clearTimer();
+    paused.value = false;
     if (item.value && item.value.type !== 'video') {
-        timer = setTimeout(() => next(), mediaDuration.value);
+        remaining = mediaDuration.value;
+        timerStart = Date.now();
+        timer = setTimeout(() => next(), remaining);
     }
 }
+/* ── Basılı-tut duraklat / bırak devam et (Instagram/WhatsApp) ── */
+function pauseTimer() {
+    if (paused.value) return;
+    paused.value = true;
+    if (timer) { clearTimeout(timer); timer = null; remaining -= (Date.now() - timerStart); }
+    const v = videoRef.value;
+    if (v && item.value && item.value.type === 'video') { try { v.pause(); } catch (e) {} }
+}
+function resumeTimer() {
+    if (!paused.value) return;
+    paused.value = false;
+    if (item.value && item.value.type !== 'video' && ready.value) {
+        if (remaining <= 0) remaining = 400;
+        timerStart = Date.now();
+        timer = setTimeout(() => next(), remaining);
+    }
+    const v = videoRef.value;
+    if (v && item.value && item.value.type === 'video') { try { v.play(); } catch (e) {} }
+}
+function onHoldStart() { if (ready.value) pauseTimer(); }
+function onHoldEnd() { resumeTimer(); }
 function preloadNext() {
     const usr = u.value; if (!usr) return;
     const nx = usr.items[curIndex.value + 1];
@@ -94,7 +124,7 @@ function preloadNext() {
 function onMediaReady() {
     ready.value = true;
     mediaDuration.value = IMG_DURATION;
-    startTimer();
+    if (open.value) startTimer();
     preloadNext();
 }
 function onVideoReady(e) {
@@ -126,10 +156,12 @@ function openViewer(uid) {
 }
 function close() {
     open.value = false;
+    paused.value = false;
     document.body.style.overflow = '';
     clearTimer();
 }
 function next() {
+    if (!open.value) return;
     const usr = u.value; if (!usr) return;
     if (curIndex.value < usr.items.length - 1) { ready.value = false; curIndex.value++; return; }
     // kullanıcının son hikayesi → sonraki kullanıcı
@@ -150,17 +182,24 @@ function prev() {
     }
 }
 
+function goProfile() {
+    const url = u.value && u.value.profile_url;
+    if (!url) return;
+    close();
+    router.visit(url);
+}
+
 function deleteCurrent() {
     const usr = u.value; if (!usr) return;
     const it = usr.items[curIndex.value];
     if (!it || !it.id) return;
+    pauseTimer();
     const doDelete = () => {
-        const token = (document.querySelector('meta[name="csrf-token"]') || {}).content || '';
         const fd = new FormData();
         fd.append('_method', 'DELETE');
         return fetch('/stories/' + it.id, {
             method: 'POST', body: fd,
-            headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json', 'X-CSRF-TOKEN': token },
+            headers: csrfHeaders(),
             credentials: 'same-origin',
         }).then((res) => {
             if (!res.ok) return res.json().then((e) => { throw new Error(e.message || 'Silme başarısız'); });
@@ -186,8 +225,9 @@ function deleteCurrent() {
             confirmButtonText: 'Evet, sil', cancelButtonText: 'Vazgeç', reverseButtons: true,
             confirmButtonColor: '#ef4444', heightAuto: false,
             didOpen: () => document.body.classList.remove('swal2-height-auto'),
-        }).then((r) => { if (r.isConfirmed) doDelete(); });
+        }).then((r) => { if (r.isConfirmed) doDelete(); else resumeTimer(); });
     } else if (confirm('Bu hikayeyi silmek istediğine emin misin?')) doDelete();
+    else resumeTimer();
 }
 
 function onKey(e) {
@@ -232,11 +272,12 @@ defineExpose({ applySeenStates });
                         <i v-if="i < curIndex" class="sp-fill sp-fill-done"></i>
                         <i v-else-if="i === curIndex && ready" class="sp-fill sp-fill-active"
                            :key="curUser + '-' + curIndex"
-                           :style="{ animationDuration: mediaDuration + 'ms' }"></i>
+                           :style="{ animationDuration: mediaDuration + 'ms', animationPlayState: paused ? 'paused' : 'running' }"></i>
                     </span>
                 </div>
                 <div class="story-viewer-head">
-                    <div class="story-viewer-user">
+                    <div class="story-viewer-user" :style="{ cursor: (u && u.profile_url) ? 'pointer' : 'default' }"
+                         @click="goProfile" data-testid="story-user-profile-link">
                         <img :src="u ? u.avatar : ''" alt="">
                         <span>{{ u ? u.name : '' }}</span>
                     </div>
@@ -246,18 +287,20 @@ defineExpose({ applySeenStates });
                         <button class="story-viewer-close" @click="close" data-testid="story-close"><i class="bi bi-x-lg"></i></button>
                     </div>
                 </div>
-                <div class="story-viewer-media" id="svMedia">
+                <div class="story-viewer-media" id="svMedia"
+                     @pointerdown="onHoldStart" @pointerup="onHoldEnd" @pointerleave="onHoldEnd" @pointercancel="onHoldEnd">
                     <div v-show="!ready" class="story-media-skeleton" data-testid="story-skeleton">
                         <div class="story-media-spinner"></div>
                     </div>
                     <template v-if="item">
-                        <video v-if="item.type === 'video'" :key="'v-' + curUser + '-' + curIndex" :src="item.url"
+                        <video v-if="item.type === 'video'" ref="videoRef" :key="'v-' + curUser + '-' + curIndex" :src="item.url"
                                autoplay playsinline controls v-show="ready"
                                @loadeddata="onVideoReady" @ended="next" @error="onVideoReady"></video>
                         <img v-else :key="'i-' + curUser + '-' + curIndex" :src="item.url" alt="" v-show="ready"
                              @load="onMediaReady" @error="onMediaReady">
                     </template>
                 </div>
+                <div v-show="paused" class="story-paused-hint"><i class="bi bi-pause-fill"></i></div>
                 <div class="story-viewer-caption">{{ item ? (item.caption || '') : '' }}</div>
                 <button class="story-nav story-prev" @click="prev"><i class="bi bi-chevron-left"></i></button>
                 <button class="story-nav story-next" @click="next"><i class="bi bi-chevron-right"></i></button>

@@ -5,7 +5,7 @@ export default { layout: AppLayout };
 
 <script setup>
 import { onMounted, nextTick } from 'vue';
-import { Head, Link } from '@inertiajs/vue3';
+import { Head, Link, router } from '@inertiajs/vue3';
 
 const props = defineProps({
     pf: Object,
@@ -21,6 +21,10 @@ const socialRows = [
 
 function err(field) {
     return props.pf.errors_flat && props.pf.errors_flat[field];
+}
+
+function messageUser() {
+    router.post(props.pf.urls.messages_start, { user_id: props.pf.user.id });
 }
 
 async function boot() {
@@ -125,9 +129,7 @@ onMounted(boot);
                                 <i class="bi bi-person-plus me-1"></i><span>Takip Et</span>
                             </template>
                         </button>
-                        <form :action="pf.urls.messages_start" method="POST" class="pf-msg-form">
-                            <input type="hidden" name="_token" :value="config.csrf">
-                            <input type="hidden" name="user_id" :value="pf.user.id">
+                        <form @submit.prevent="messageUser" class="pf-msg-form">
                             <button type="submit" class="pf-btn-secondary" data-testid="profile-message-btn">
                                 <i class="bi bi-chat-dots me-1"></i> Mesaj
                             </button>

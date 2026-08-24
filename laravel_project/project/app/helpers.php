@@ -102,6 +102,7 @@ if (!function_exists('story_bar_data')) {
                     'name'    => $su->id === auth()->id() ? 'Hikayen' : $su->name,
                     'avatar'  => $su->profile_img,
                     'isOwner' => auth()->id() === $su->id,
+                    'profile_url' => $su->username ? route('profile.public', $su->username) : null,
                     'items'   => $su->stories->map(fn ($st) => [
                         'id'      => $st->id,
                         'type'    => $st->media_type,

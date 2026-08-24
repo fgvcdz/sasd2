@@ -96,3 +96,16 @@ html.light-mode .idx-card-img::before {
     animation: storySpin .8s linear infinite;
 }
 @keyframes storySpin { to { transform: rotate(360deg); } }
+
+/* --- Hikaye: basılı-tut duraklat göstergesi --- */
+.story-paused-hint {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    z-index: 6; pointer-events: none;
+    width: 64px; height: 64px; border-radius: 50%;
+    background: rgba(0,0,0,0.45); backdrop-filter: blur(4px);
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 30px;
+}
+
+/* --- SweetAlert her zaman hikaye görüntüleyicinin ÜSTÜNDE olsun (silme onayı) --- */
+.swal2-container { z-index: 100000 !important; }

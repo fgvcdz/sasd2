@@ -1,0 +1,22 @@
+{
+  "summary": "Frontend-only retest of 3 bug fixes on artirdim.com. All PASS. (1) /messages send now works: buyer sent 2 messages to seller conv (id=2), POST /messages/2 returned 200 both times, new bubbles appeared without reload — no 419. (2) Story viewer header (data-testid=story-user-profile-link) is clickable and SPA-navigates to /u/seller when opening seller's story. (3) Story delete SweetAlert appears on top: .swal2-container zIndex=100000 vs .story-viewer zIndex=20000; elementFromPoint at swal center returns swal2-title (topmost); visible & clickable; Vazgeç cancel worked.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "Unrelated: multiple 403 console errors from notification/heartbeat polling on public pages — noted in agent-to-agent context as ignorable, but worth quieting in a future pass."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A (skipped)", "frontend": "100% (3/3 targeted bug fixes verified)"},
+  "test_credentials": "buyer@test.com / password; seller@test.com / password",
+  "seed_data_creation": "Sent 2 test messages TEST_MSG_1_* and TEST_MSG_2_* in buyer↔seller conversation (id=2).",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "All 3 fixes (messages CSRF via X-XSRF-TOKEN, story profile link, story delete swal z-index) verified working on preview URL. Login uses data-testid=login-email/login-password and form.auth-form.requestSubmit(). Buyer's own story appears with label 'Hikayen' data-testid=story-user-3.",
+  "rca of the issue": "Not applicable — all fixes validated on this iteration."
+}

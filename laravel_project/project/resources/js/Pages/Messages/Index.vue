@@ -6,6 +6,7 @@ export default { layout: AppLayout };
 <script setup>
 import { Head, Link } from '@inertiajs/vue3';
 import { ref, reactive, nextTick, onMounted, onBeforeUnmount } from 'vue';
+import { csrfHeaders } from '@/csrf';
 
 const props = defineProps({
     conversations: Array,
@@ -43,7 +44,8 @@ function send() {
     input.value = '';
     fetch(props.active.store_url, {
         method: 'POST',
-        headers: { 'X-CSRF-TOKEN': csrf(), 'Accept': 'application/json', 'Content-Type': 'application/json' },
+        headers: csrfHeaders({ 'Content-Type': 'application/json' }),
+        credentials: 'same-origin',
         body: JSON.stringify({ body }),
     })
         .then((r) => r.json())

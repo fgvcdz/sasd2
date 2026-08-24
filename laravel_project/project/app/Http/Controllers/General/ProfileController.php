@@ -148,6 +148,7 @@ class ProfileController extends Controller
                     'name' => $user->name,
                     'avatar' => $user->profile_img,
                     'isOwner' => (bool) $isOwner,
+                    'profile_url' => $user->username ? route('profile.public', $user->username) : null,
                     'items' => $heroStories->map(fn ($st) => [
                         'id' => $st->id,
                         'type' => $st->media_type,

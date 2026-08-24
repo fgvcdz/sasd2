@@ -231,7 +231,7 @@ onUnmounted(() => {
                                     </div>
                                     <template v-else>
                                         <div style="max-height:340px; overflow-y:auto;">
-                                            <a v-for="n in headerNotifs" :key="n.id" :href="n.link"
+                                            <Link v-for="n in headerNotifs" :key="n.id" :href="n.link && n.link !== '#' ? n.link : route('notifications.index')"
                                                class="dropdown-item d-flex align-items-center gap-2 py-2 px-3"
                                                :style="{ whiteSpace: 'normal', background: n.unread ? '#155eef0a' : 'transparent' }">
                                                 <div style="position:relative; width:34px; height:34px; flex-shrink:0;">
@@ -247,7 +247,7 @@ onUnmounted(() => {
                                                     <div style="font-size:11px;color:var(--search-text-muted);margin-top:2px;">{{ n.time }}</div>
                                                 </div>
                                                 <div v-if="n.unread" style="width:7px;height:7px;border-radius:50%;background:#155eef;flex-shrink:0;"></div>
-                                            </a>
+                                            </Link>
                                         </div>
                                         <div class="px-3 py-2 border-top" style="border-color:var(--search-border)!important;">
                                             <Link :href="route('notifications.index')" class="d-block text-center text-decoration-none" style="font-size:12px;color:var(--search-text-muted);">Tüm bildirimleri gör</Link>

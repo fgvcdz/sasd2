@@ -354,3 +354,8 @@ Bilerek `<a>` kalanlar: Canlı Yayın (broadcast_url — GRUP 3 hâlâ Blade), G
 6. **Profil hikaye oynatma:** StoryViewer artık `.story-source` DOM'undan da veri okur (`window.__refreshStorySources`).
 7. **Hikaye görüntüleyici (Instagram/WhatsApp):** üstte animasyonlu progress bar (`.sp-fill-active` storyFill), 5sn otomatik ilerleme (setTimeout), son hikaye sonrası bir sonraki KULLANICIYA geçiş (`window.STORY_ORDER`), görsel tam yüklenene kadar skeleton/spinner (yarım render yok) + sonraki görseli ön-yükleme.
 8. **Skeleton loader:** anasayfa ilan kartı görselleri için shimmer (`.idx-card-img::before`) + görsel yüklenince fade-in (`.loaded`/`.img-ready`).
+
+## 🩹 Bug Fix Turu 3 (kullanıcı geri bildirimi) — TAMAM ✅ (testing agent 3/3 PASS, iteration_9)
+- **Mesaj gönderilemiyordu (419 CSRF):** SPA'da `<meta csrf-token>` login sonrası bayatlıyordu. `resources/js/csrf.js` eklendi → `XSRF-TOKEN` cookie'sinden `X-XSRF-TOKEN` (her yanıtta taze). Messages/Index send() ve StoryViewer delete bunu kullanıyor. Bildirim `<Link>`'ine de `route('notifications.index')` fallback eklendi (iteration_8).
+- **Story kullanıcı profil linki:** Görüntüleyici başlığındaki ad/avatar tıklanınca kullanıcının profiline SPA geçiş (payload'a `profile_url` eklendi).
+- **Story silme modalı arkada açılıyordu:** `.swal2-container{z-index:100000}` (story-viewer 20000 idi) → SweetAlert artık üstte; silme sırasında ilerleme duraklıyor, iptal edilince devam ediyor.

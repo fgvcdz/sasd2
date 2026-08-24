@@ -1,0 +1,37 @@
+{
+  "summary": "Frontend verification of the follow-up fixes: (1) PROFILE message-seller SPA, (2) AUCTION detail message-seller SPA, (3) header notification links SPA, (4) story hold-to-pause + release resume, and (5) regression on auto-advance & close. Message-seller SPA works from BOTH places, story hold-to-pause works exactly as specified (animationPlayState toggles paused<->running, .story-paused-hint shows, no auto-advance while held for 6s+). Notification-dropdown Inertia <Link> is wired correctly (SPA preserved), BUT the per-notification `link` field is EMPTY on all 4 seeded notifications, so clicks resolve to href='' (current URL) — the SPA plumbing works but there is no destination to navigate to. Story close after auto-advance to next user occasionally fails to dismiss on first click (already noted in iteration_6).",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [
+      {"component": "AppLayout.vue notifications dropdown", "issue": "Rendered as <a href=\"\"> because n.link is empty for all seeded notifications. Inertia <Link> conversion is done correctly (window.__spa='alive' is preserved on click, no full reload), but clicking any of the 4 unread notification items keeps user on the same page (href='' resolves to current URL). Root cause is DATA/backend supplying empty `link` field on NotificationResource. Frontend is technically correct.", "selector": "a.dropdown-item inside notif dropdown (rendered by <Link :href=\"n.link\">)", "priority": "MEDIUM"},
+      {"component": "StoryViewer close after cross-user auto-advance", "issue": "data-testid=story-close click sometimes does not close the viewer after auto-advance from user A -> user B (still occurs; same as iteration_6). Non-blocking; direct close on same-user story works.", "selector": "[data-testid=story-close]", "priority": "LOW"}
+    ],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "verified_features": {
+    "test1_profile_message_spa": "PASS — /u/seller [data-testid=profile-message-btn] -> /messages/4, window.__spa='alive' preserved (no full reload).",
+    "test2_auction_message_spa": "PASS — /auctions/mavi-beyaz-cini-vazo-uclusu-qdxU [data-testid=message-seller-btn] -> /messages/3, window.__spa='alive' preserved.",
+    "test3_notification_spa_mechanism": "PASS (mechanism) / FAIL (destination) — Click on a.dropdown-item keeps __spa='alive' (Inertia <Link> intercepted click, no full reload) BUT n.link=='' so page didn't change. Item outerHTML confirms href='' on all 4 unread items.",
+    "test4_story_hold_to_pause": "PASS — Before hold: playState='running', animation='5s linear forwards storyFill'. During pointerdown on #svMedia (2s): playState='paused', .story-paused-hint visible (display:flex, opacity:1). Continued hold ~6s: still paused, same story (no auto-advance while held). After pointerup: playState='running' resumed. Screenshot .screenshots/story_hold_paused.png shows pause indicator (‖) overlay on the media.",
+    "test5_auto_advance": "PASS — With no hold, img.src changed after ~5s (progress bar completed animation → next story).",
+    "test5_story_close": "MOSTLY FAIL in same session — After long test session (post auto-advance to next user), single click on data-testid=story-close did not dismiss #svMedia. Same intermittent bug from iteration_6."
+  },
+  "test_report_links": [".screenshots/story_hold_paused.png"],
+  "action_items": [
+    "Fix backend NotificationResource to populate `link` field (target URL like /messages/{id} or /support/tickets/{id}) so header notification items actually navigate somewhere. Frontend SPA conversion is already correct.",
+    "Investigate story-close reliability after cross-user auto-advance transition (may be a race between resetting viewer state and click handler)."
+  ],
+  "critical_code_review_comments": [
+    "AppLayout.vue L234: <Link :href=\"n.link\"> — no fallback when n.link is empty; consider `:href=\"n.link || route('notifications.index')\"` so clicks always land somewhere sensible.",
+    "Console shows repeated 403s on /api/notifications/... polling — already reported and expected per this request."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A", "frontend": "5/6 core assertions PASS (profile msg SPA, auction msg SPA, story hold-pause, hold-no-advance, release-resume, auto-advance). Notification SPA mechanism works but destination href is empty; story-close post-auto-advance intermittent."},
+  "test_credentials": "buyer@test.com/password, seller@test.com/password",
+  "seed_data_creation": "none",
+  "retest_needed": true,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "The key finding: notification <Link> click DOES preserve __spa (SPA works), but n.link is empty in payload — backend/data-side fix needed on NotificationResource.link. Story hold-to-pause uses pointerdown/pointerup on #svMedia; dispatching PointerEvent + MouseEvent in evaluate() works reliably. .story-paused-hint element is always present in DOM; only display/opacity change between paused/running — do NOT assert on element existence, assert on getComputedStyle(hint).display or animationPlayState.",
+  "rca of the issue": "Notification dropdown non-navigation: <Link :href=\"n.link\"> resolves to href='' because the NotificationResource returns empty string for `link`. Fix by populating a proper URL server-side (or add frontend fallback to route('notifications.index'))."
+}
