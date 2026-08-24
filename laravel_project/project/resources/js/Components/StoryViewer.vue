@@ -1,21 +1,35 @@
 <script setup>
 /*
- | Hikaye görüntüleyici — public/assets/js/custom/story-viewer.js'in SPA-güvenli Vue portu.
- | Aynı DOM class/id'leri korunur (CSS theme-new.css). Teleport ile body altına render edilir
- | (eski Blade davranışı: viewer body altındaydı). window.openStoryViewer/... global fonksiyonları
- | kaydeder; StoryBar.vue ve Profile/Show.vue bunları çağırır. window.STORY_DATA veri kaynağıdır.
+ | Hikaye görüntüleyici (Instagram/WhatsApp tarzı):
+ |  - Üstte segment segment ilerleyen animasyonlu progress bar
+ |  - Otomatik ilerleme; son hikayeden sonra bir sonraki KULLANICIYA geçer
+ |  - Görsel tam yüklenmeden gösterilmez (yarım render yok) + sonraki görseli ön-yükler
+ |  - window.STORY_DATA veri kaynağı, window.STORY_ORDER kullanıcı sırası
+ |  - Profil sayfası .story-source DOM'undan da veri okur (fallback)
 */
-import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue';
+import { ref, computed, watch, onMounted, onBeforeUnmount, nextTick } from 'vue';
+
+const IMG_DURATION = 5000;
 
 const open = ref(false);
 const curUser = ref(null);
 const curIndex = ref(0);
+const ready = ref(false);
+const mediaDuration = ref(IMG_DURATION);
 let timer = null;
 
 const u = computed(() => (curUser.value != null && window.STORY_DATA) ? window.STORY_DATA[curUser.value] : null);
 const item = computed(() => (u.value && u.value.items) ? u.value.items[curIndex.value] : null);
+const items = computed(() => (u.value && u.value.items) ? u.value.items : []);
 
-/* ── Instagram mantığı: görülen hikaye halkası soluk/gri ── */
+/* ── Kullanıcı sırası (kullanıcılar arası geçiş) ── */
+function order() {
+    const ord = Array.isArray(window.STORY_ORDER) ? window.STORY_ORDER.slice() : [];
+    if (curUser.value != null && !ord.includes(curUser.value)) ord.push(curUser.value);
+    return ord;
+}
+
+/* ── Görülen hikaye halkası (Instagram: soluk) ── */
 const SEEN_KEY = 'artirdim_seen_stories';
 function getSeen() { try { return new Set(JSON.parse(localStorage.getItem(SEEN_KEY) || '[]')); } catch (e) { return new Set(); } }
 function saveSeen(set) { localStorage.setItem(SEEN_KEY, JSON.stringify([...set])); }
@@ -44,42 +58,108 @@ function markUserSeen(uid) {
     if (el) paintRing(el, true);
 }
 
-function scheduleAdvance() {
-    clearTimeout(timer);
-    if (item.value && item.value.type !== 'video') timer = setTimeout(() => next(), 5000);
+/* ── Profil .story-source fallback ── */
+function hydrateFromSources(uid) {
+    if (window.STORY_DATA && window.STORY_DATA[uid]) return;
+    const el = document.querySelector('.story-source[data-user-id="' + uid + '"]');
+    if (!el) return;
+    try {
+        const payload = JSON.parse(el.dataset.storyPayload || 'null');
+        if (payload) { window.STORY_DATA = window.STORY_DATA || {}; window.STORY_DATA[uid] = payload; }
+    } catch (e) {}
+}
+function refreshStorySources() {
+    document.querySelectorAll('.story-source[data-user-id]').forEach((el) => {
+        const uid = el.dataset.userId;
+        try {
+            const payload = JSON.parse(el.dataset.storyPayload || 'null');
+            if (payload) { window.STORY_DATA = window.STORY_DATA || {}; window.STORY_DATA[uid] = payload; }
+        } catch (e) {}
+    });
 }
 
+/* ── Zamanlama & ön-yükleme ── */
+function clearTimer() { clearTimeout(timer); timer = null; }
+function startTimer() {
+    clearTimer();
+    if (item.value && item.value.type !== 'video') {
+        timer = setTimeout(() => next(), mediaDuration.value);
+    }
+}
+function preloadNext() {
+    const usr = u.value; if (!usr) return;
+    const nx = usr.items[curIndex.value + 1];
+    if (nx && nx.type !== 'video') { const im = new Image(); im.src = nx.url; }
+}
+function onMediaReady() {
+    ready.value = true;
+    mediaDuration.value = IMG_DURATION;
+    startTimer();
+    preloadNext();
+}
+function onVideoReady(e) {
+    ready.value = true;
+    const d = e?.target?.duration;
+    mediaDuration.value = (d && isFinite(d)) ? d * 1000 : IMG_DURATION;
+    clearTimer(); // video kendi 'ended' olayıyla ilerler
+    preloadNext();
+}
+
+/* ── Aç/kapat & gezinme ── */
+function gotoUser(uid, index) {
+    hydrateFromSources(uid);
+    const usr = window.STORY_DATA?.[uid];
+    if (!usr || !usr.items || !usr.items.length) return false;
+    ready.value = false;
+    curUser.value = uid;
+    curIndex.value = Math.min(Math.max(index, 0), usr.items.length - 1);
+    markUserSeen(uid);
+    return true;
+}
 function openViewer(uid) {
+    hydrateFromSources(uid);
     const usr = window.STORY_DATA?.[uid];
     if (!usr || !usr.items || !usr.items.length) return;
-    curUser.value = uid; curIndex.value = 0; open.value = true;
+    open.value = true;
     document.body.style.overflow = 'hidden';
-    markUserSeen(uid);
+    gotoUser(uid, 0);
 }
 function close() {
     open.value = false;
     document.body.style.overflow = '';
-    clearTimeout(timer);
+    clearTimer();
 }
 function next() {
     const usr = u.value; if (!usr) return;
-    if (curIndex.value < usr.items.length - 1) curIndex.value++;
-    else close();
+    if (curIndex.value < usr.items.length - 1) { ready.value = false; curIndex.value++; return; }
+    // kullanıcının son hikayesi → sonraki kullanıcı
+    const ord = order();
+    const pos = ord.indexOf(curUser.value);
+    for (let i = pos + 1; i < ord.length; i++) {
+        if (gotoUser(ord[i], 0)) return;
+    }
+    close();
 }
-function prev() { if (curIndex.value > 0) curIndex.value--; }
+function prev() {
+    if (curIndex.value > 0) { ready.value = false; curIndex.value--; return; }
+    const ord = order();
+    const pos = ord.indexOf(curUser.value);
+    for (let i = pos - 1; i >= 0; i--) {
+        const usr = window.STORY_DATA?.[ord[i]];
+        if (usr && usr.items && usr.items.length && gotoUser(ord[i], usr.items.length - 1)) return;
+    }
+}
 
 function deleteCurrent() {
     const usr = u.value; if (!usr) return;
     const it = usr.items[curIndex.value];
     if (!it || !it.id) return;
-
     const doDelete = () => {
         const token = (document.querySelector('meta[name="csrf-token"]') || {}).content || '';
         const fd = new FormData();
         fd.append('_method', 'DELETE');
         return fetch('/stories/' + it.id, {
-            method: 'POST',
-            body: fd,
+            method: 'POST', body: fd,
             headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json', 'X-CSRF-TOKEN': token },
             credentials: 'same-origin',
         }).then((res) => {
@@ -100,18 +180,14 @@ function deleteCurrent() {
             if (window.ajaxToast) window.ajaxToast('error', err.message); else alert(err.message);
         });
     };
-
     if (window.Swal) {
         window.Swal.fire({
-            title: 'Hikayeyi silmek istediğine emin misin?',
-            icon: 'warning', showCancelButton: true,
-            confirmButtonText: 'Evet, sil', cancelButtonText: 'Vazgeç',
-            reverseButtons: true, confirmButtonColor: '#ef4444', heightAuto: false,
+            title: 'Hikayeyi silmek istediğine emin misin?', icon: 'warning', showCancelButton: true,
+            confirmButtonText: 'Evet, sil', cancelButtonText: 'Vazgeç', reverseButtons: true,
+            confirmButtonColor: '#ef4444', heightAuto: false,
             didOpen: () => document.body.classList.remove('swal2-height-auto'),
         }).then((r) => { if (r.isConfirmed) doDelete(); });
-    } else {
-        if (confirm('Bu hikayeyi silmek istediğine emin misin?')) doDelete();
-    }
+    } else if (confirm('Bu hikayeyi silmek istediğine emin misin?')) doDelete();
 }
 
 function onKey(e) {
@@ -121,7 +197,8 @@ function onKey(e) {
     if (e.key === 'Escape') close();
 }
 
-watch(item, () => scheduleAdvance());
+/* item değişince zamanlayıcıyı sıfırla (yükleme bitince yeniden başlar) */
+watch(item, () => { clearTimer(); });
 
 onMounted(() => {
     window.openStoryViewer = openViewer;
@@ -129,14 +206,16 @@ onMounted(() => {
     window.storyNext = next;
     window.storyPrev = prev;
     window.deleteCurrentStory = deleteCurrent;
+    window.__refreshStorySources = refreshStorySources;
     window.addEventListener('keydown', onKey);
     window.addEventListener('pageshow', applySeenStates);
+    refreshStorySources();
     applySeenStates();
 });
 onBeforeUnmount(() => {
     window.removeEventListener('keydown', onKey);
     window.removeEventListener('pageshow', applySeenStates);
-    clearTimeout(timer);
+    clearTimer();
     document.body.style.overflow = '';
 });
 
@@ -149,8 +228,12 @@ defineExpose({ applySeenStates });
             <div class="story-viewer-backdrop" @click="close"></div>
             <div class="story-viewer-stage">
                 <div class="story-progress" id="storyProgress">
-                    <span v-for="(it, i) in (u ? u.items : [])" :key="i"
-                          :class="i < curIndex ? 'done' : (i === curIndex ? 'active' : '')"></span>
+                    <span v-for="(it, i) in items" :key="i" class="sp-seg">
+                        <i v-if="i < curIndex" class="sp-fill sp-fill-done"></i>
+                        <i v-else-if="i === curIndex && ready" class="sp-fill sp-fill-active"
+                           :key="curUser + '-' + curIndex"
+                           :style="{ animationDuration: mediaDuration + 'ms' }"></i>
+                    </span>
                 </div>
                 <div class="story-viewer-head">
                     <div class="story-viewer-user">
@@ -164,9 +247,15 @@ defineExpose({ applySeenStates });
                     </div>
                 </div>
                 <div class="story-viewer-media" id="svMedia">
+                    <div v-show="!ready" class="story-media-skeleton" data-testid="story-skeleton">
+                        <div class="story-media-spinner"></div>
+                    </div>
                     <template v-if="item">
-                        <video v-if="item.type === 'video'" :src="item.url" autoplay playsinline controls></video>
-                        <img v-else :src="item.url" alt="">
+                        <video v-if="item.type === 'video'" :key="'v-' + curUser + '-' + curIndex" :src="item.url"
+                               autoplay playsinline controls v-show="ready"
+                               @loadeddata="onVideoReady" @ended="next" @error="onVideoReady"></video>
+                        <img v-else :key="'i-' + curUser + '-' + curIndex" :src="item.url" alt="" v-show="ready"
+                             @load="onMediaReady" @error="onMediaReady">
                     </template>
                 </div>
                 <div class="story-viewer-caption">{{ item ? (item.caption || '') : '' }}</div>

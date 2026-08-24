@@ -7,7 +7,7 @@ export default {
 </script>
 
 <script setup>
-import { Head, useForm } from '@inertiajs/vue3';
+import { Head, Link, useForm } from '@inertiajs/vue3';
 defineProps({ activeAuctions: Number });
 
 const form = useForm({ email: '', password: '', remember: false });
@@ -65,14 +65,14 @@ function submit() {
                 <input class="form-check-input" type="checkbox" v-model="form.remember" :value="true">
                 <span class="ms-2">Beni Hatırla</span>
             </label>
-            <a :href="route('password.request')" class="text-primary text-decoration-none">Şifremi unuttum?</a>
+            <Link :href="route('password.request')" class="text-primary text-decoration-none">Şifremi unuttum?</Link>
         </div>
 
         <div class="d-grid mb-4">
             <button type="submit" class="btn btn-auth-primary btn-lg" :disabled="form.processing" data-testid="login-submit">Giriş Yap</button>
         </div>
         <div class="d-grid">
-            <a :href="route('register')" class="btn btn-auth-outline btn-lg">Hesabın yok mu? Kayıt ol</a>
+            <Link :href="route('register')" class="btn btn-auth-outline btn-lg">Hesabın yok mu? Kayıt ol</Link>
         </div>
     </form>
 </template>

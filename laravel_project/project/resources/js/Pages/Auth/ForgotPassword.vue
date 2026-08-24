@@ -7,7 +7,7 @@ export default {
 </script>
 
 <script setup>
-import { Head, useForm } from '@inertiajs/vue3';
+import { Head, Link, useForm } from '@inertiajs/vue3';
 const props = defineProps({ status: String, activeAuctions: Number });
 
 const form = useForm({ email: '' });
@@ -39,7 +39,7 @@ function submit() { form.post(route('password.email')); }
             <button class="btn btn-auth-primary btn-lg fw-bold" type="submit" :disabled="form.processing" data-testid="forgot-submit">Gönder</button>
         </div>
         <div class="d-grid">
-            <a :href="route('login')" class="btn btn-auth-outline btn-lg">← Geri dön</a>
+            <Link :href="route('login')" class="btn btn-auth-outline btn-lg">← Geri dön</Link>
         </div>
     </form>
 </template>

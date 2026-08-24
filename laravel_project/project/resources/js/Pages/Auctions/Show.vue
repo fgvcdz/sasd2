@@ -5,12 +5,16 @@ export default { layout: AppLayout };
 
 <script setup>
 import { onMounted, onUnmounted, nextTick } from 'vue';
-import { Head, Link } from '@inertiajs/vue3';
+import { Head, Link, router } from '@inertiajs/vue3';
 
 const props = defineProps({
     a: Object,
     config: Object,
 });
+
+function messageSeller() {
+    router.post(props.config.messages_start_url, { user_id: props.a.seller.id });
+}
 
 function loadScript(src) {
     return new Promise((resolve) => {
@@ -320,9 +324,7 @@ onUnmounted(() => {
                     </div>
                     <div class="seller-actions">
                         <template v-if="config.is_auth === '1'">
-                            <form v-if="config.current_user_id !== a.seller.id" :action="config.messages_start_url" method="POST" class="seller-msg-form">
-                                <input type="hidden" name="_token" :value="config.csrf">
-                                <input type="hidden" name="user_id" :value="a.seller.id">
+                            <form v-if="config.current_user_id !== a.seller.id" @submit.prevent="messageSeller" class="seller-msg-form">
                                 <button type="submit" class="seller-btn-primary" data-testid="message-seller-btn">
                                     <i class="bi bi-chat-dots"></i> Satıcıya Mesaj Gönder
                                 </button>

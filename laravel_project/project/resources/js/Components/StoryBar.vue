@@ -18,6 +18,8 @@ onMounted(() => {
     // Blade'deki story-data.js yerine: payload'ları doğrudan global objeye yükle
     window.STORY_DATA = window.STORY_DATA || {};
     props.stories.forEach((s) => { window.STORY_DATA[s.id] = s.payload; });
+    // Kullanıcı sırası (kullanıcılar arası geçiş için)
+    window.STORY_ORDER = props.stories.map((s) => s.id);
     // story-viewer.js seen-state boyamasını yeniden tetikle (Vue DOM'u sonradan render eder)
     setTimeout(() => window.dispatchEvent(new Event('pageshow')), 50);
 });

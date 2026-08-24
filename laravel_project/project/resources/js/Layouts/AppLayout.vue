@@ -96,6 +96,8 @@ function pickRecent(q) {
 }
 function onResultClick(item) {
     saveRecent(item.title);
+    showResults.value = false;
+    router.visit(item.url);
 }
 function onClickOutside(e) {
     const wrap = document.querySelector('.mhdr-search-wrap');
@@ -166,7 +168,7 @@ onUnmounted(() => {
                             <div id="search-results" class="mhdr-search-results" :class="{ 'd-none': !showResults }">
                                 <template v-if="searchQuery.trim() && searchResults.length">
                                     <a v-for="item in searchResults" :key="item.url" :href="item.url"
-                                       class="search-result-item" @click="onResultClick(item)">
+                                       class="search-result-item" @click.prevent="onResultClick(item)">
                                         <div class="search-result-avatar"><img :src="item.avatar" :alt="item.title"></div>
                                         <div class="search-result-info">
                                             <span class="search-result-title">{{ item.title }}</span>

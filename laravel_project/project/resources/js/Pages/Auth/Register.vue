@@ -8,7 +8,7 @@ export default {
 
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue';
-import { Head, useForm } from '@inertiajs/vue3';
+import { Head, Link, useForm } from '@inertiajs/vue3';
 
 defineProps({ activeAuctions: Number });
 
@@ -183,7 +183,7 @@ onMounted(() => {
 
             <button type="button" class="btn btn-auth-primary btn-lg w-100" @click="goStep1Next" data-testid="register-step1-next">Devam et</button>
             <div class="text-center mt-4">
-                <a :href="route('login')" class="btn btn-auth-outline btn-lg w-100">Zaten hesabın var mı? Giriş yap</a>
+                <Link :href="route('login')" class="btn btn-auth-outline btn-lg w-100">Zaten hesabın var mı? Giriş yap</Link>
             </div>
         </div>
 

@@ -344,3 +344,13 @@ Kullanıcı isteği: Users index'te "Kullanıcı Ekle" butonu yoktu (Blade'de + 
 Dönüştürülmüş Inertia sayfalarına giden ama tam sayfa yenileyen `<a :href>` linkleri `<Link>`'e çevrildi:
 Admin/Dashboard (4 hızlı işlem + "Tümü"), Admin/Auctions/Show (satıcı oku), Admin/Categories/Index+Show (Yeni/Alt Kategori), Dashboard (teklif başlığı + favori kartı), Buyer/Favorites, Buyer/MyBids, Messages/Index (peer adı), Profile/Show (İlan Oluştur).
 Bilerek `<a>` kalanlar: Canlı Yayın (broadcast_url — GRUP 3 hâlâ Blade), Google OAuth, Auth login/register çapraz linkleri, AppLayout arama dropdown & hash linkleri.
+
+## 🎯 UI İyileştirme Turu (kullanıcı geri bildirimi) — TAMAM ✅ (testing agent 8/8 PASS, iteration_6)
+1. **Auth linkleri SPA:** Login/Register/ForgotPassword/ResetPassword çapraz linkleri `<a>`→`<Link>` (Google OAuth bilerek `<a>`).
+2. **Auth logo light mode ortalama:** `admin-fixes.css`'e `html.light-mode .logo-light{display:inline-block}` (dark modda !important vardı).
+3. **İlan detay "Satıcıya Mesaj Gönder":** native form POST → Inertia `router.post` (yenileme yok).
+4. **Header arama sonucu:** `<a href>` → `router.visit` (SPA).
+5. **Mesajlar sayfası genişletildi:** `.msg-page max-width 1100→1400px`.
+6. **Profil hikaye oynatma:** StoryViewer artık `.story-source` DOM'undan da veri okur (`window.__refreshStorySources`).
+7. **Hikaye görüntüleyici (Instagram/WhatsApp):** üstte animasyonlu progress bar (`.sp-fill-active` storyFill), 5sn otomatik ilerleme (setTimeout), son hikaye sonrası bir sonraki KULLANICIYA geçiş (`window.STORY_ORDER`), görsel tam yüklenene kadar skeleton/spinner (yarım render yok) + sonraki görseli ön-yükleme.
+8. **Skeleton loader:** anasayfa ilan kartı görselleri için shimmer (`.idx-card-img::before`) + görsel yüklenince fade-in (`.loaded`/`.img-ready`).

@@ -7,7 +7,7 @@ export default {
 </script>
 
 <script setup>
-import { Head, useForm } from '@inertiajs/vue3';
+import { Head, Link, useForm } from '@inertiajs/vue3';
 const props = defineProps({ email: String, token: String, activeAuctions: Number });
 
 const form = useForm({ token: props.token, email: props.email, password: '', password_confirmation: '' });
@@ -52,7 +52,7 @@ function submit() {
             <button class="btn btn-auth-primary btn-lg fw-bold" type="submit" :disabled="form.processing" data-testid="reset-submit">Şifreyi Güncelle</button>
         </div>
         <div class="d-grid">
-            <a :href="route('login')" class="btn btn-auth-outline btn-lg">← Geri Dön</a>
+            <Link :href="route('login')" class="btn btn-auth-outline btn-lg">← Geri Dön</Link>
         </div>
     </form>
 </template>
