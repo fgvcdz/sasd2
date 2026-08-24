@@ -46,6 +46,8 @@ Route::controller(BrowseController::class)->prefix('browse')->name('browse.')->g
 
 Route::get('/auctions/{auction:slug}', [BidController::class, 'show'])->name('auctions.show');
 Route::get('/auctions/{auction:slug}/live-state', [BidController::class, 'liveState'])->name('auctions.live-state');
+Route::post('/auctions/{auction:slug}/livekit-token', [\App\Http\Controllers\LiveKitTokenController::class, 'token'])
+    ->middleware('auth')->name('auctions.livekit-token');
 Route::get('/auctions/{auction:slug}/chat', [ChatController::class, 'poll'])->name('auctions.chat.poll');
 Route::get('/u/{username}', [ProfileController::class, 'show'])
     ->where('username', '[a-z0-9._]+')

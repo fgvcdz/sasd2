@@ -42,4 +42,10 @@ return [
         'redirect'      => env('GOOGLE_REDIRECT_URI') ?: (env('APP_URL').'/auth/google/callback'),
     ],
 
+    'livekit' => [
+        'url'    => env('LIVEKIT_URL'),
+        'key'    => env('LIVEKIT_API_KEY'),
+        'secret' => env('LIVEKIT_API_SECRET'),
+    ],
+
 ];

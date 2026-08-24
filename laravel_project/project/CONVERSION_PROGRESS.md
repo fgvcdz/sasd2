@@ -364,3 +364,11 @@ Bilerek `<a>` kalanlar: Canlı Yayın (broadcast_url — GRUP 3 hâlâ Blade), G
 - **Sorun:** Mesaj ilk denemede gönderilemiyor, "bir kez yenileyince" çalışıyordu. Kök neden: SPA'da `<meta csrf-token>` (ve fallback'ler) login/gezinti sonrası bayat → POST 419.
 - **Çözüm:** `HandleInertiaRequests` artık her yanıtta taze `csrf_token` prop'u paylaşıyor; `AppLayout` her `router.on('success')`'te `<meta>`'yı ve `axios` default header'ını güncelliyor; `Messages/Index send()` doğrudan `page.props.csrf_token`'ı `X-CSRF-TOKEN` olarak gönderiyor. `csrf.js` öncelik: explicit token > XSRF cookie > meta.
 - Doğrulama: ilk-deneme SPA mesaj POST 200, yenileme sonrası 200, admin destek yanıtı 200, story silme CSRF hatasız.
+
+## 🩹 Bug Fix Turu 5 (testing agent 2/2 PASS, iteration_11)
+- **Anasayfadan ilana girince en üstten başlama:** Auctions/Show boot() `scrollTopHard()` (script yükleme öncesi+sonrası + rAF + 120/350ms timeout, window+container'lar).
+- **Satıcı header sadeleştirme:** Satıcı aksiyonları tek profesyonel 'Satıcı' dropdown'ında (İlan Ver / İlanlarım / Satışlarım / Canlıya Başla); mobilde kompakt '+' ikonu. Bakiye pill korundu.
+
+## ⏭️ SIRADA: LiveKit canlı yayın (kullanıcı LiveKit seçti) — ANAHTAR BEKLENİYOR
+Playbook alındı (agence104/livekit-server-sdk + livekit-client). Gerekli: LIVEKIT_URL (wss://...), LIVEKIT_API_KEY, LIVEKIT_API_SECRET.
+Yapılacak: token endpoint (Laravel), AuctionLiveStream.vue (publish/subscribe), broadcast sayfası Twitch/Kick tarzı redesign (chat video üstünde, tam ekran, "satılıyor" 10sn geri sayım overlay, yeni teklifte iptal, mobil/masaüstü), izleyici sayımından yayıncıyı çıkarma (role=viewer metadata).

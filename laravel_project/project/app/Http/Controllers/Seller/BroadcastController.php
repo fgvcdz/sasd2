@@ -8,6 +8,8 @@ use App\Models\Auction;
 use App\Models\Bid;
 use App\Services\OrderService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+use Inertia\Inertia;
 
 class BroadcastController extends Controller
 {
@@ -17,16 +19,39 @@ class BroadcastController extends Controller
     {
         abort_unless($auction->user_id === auth()->id(), 403);
 
-        // Yayın moduna geç (canlı). is_live YALNIZCA kamera başlatılınca true olur
-        // (liveStatus endpoint'i ile) — böylece izleyici "Canlı İzle" sekmesini
-        // yalnızca gerçekten yayın varken görür.
         if (! $auction->hasFinished() && $auction->stream_mode !== 'live') {
             $auction->update(['stream_mode' => 'live']);
         }
 
-        $viewerCount = 0;
+        $auction->load('cover');
+        $bids = $auction->bids()->with('user')->latest()->limit(30)->get()->map(fn ($b) => [
+            'id'     => $b->id,
+            'user'   => $b->user?->name,
+            'amount' => $b->amount,
+            'display'=> number_format($b->amount, 0, ',', '.') . ' ₺',
+            'time'   => $b->created_at->format('H:i'),
+        ]);
 
-        return view('auctions', compact('auction', 'viewerCount'));
+        return Inertia::render('Seller/Broadcast', [
+            'auction' => [
+                'id'            => $auction->id,
+                'slug'          => $auction->slug,
+                'title'         => $auction->title,
+                'cover_url'     => $auction->cover?->url() ?? asset('assets/media/placeholder.svg'),
+                'current_price' => number_format($auction->current_price, 0, ',', '.') . ' ₺',
+                'is_finished'   => $auction->hasFinished(),
+            ],
+            'bids' => $bids,
+            'urls' => [
+                'token'      => route('auctions.livekit-token', $auction),
+                'live_state' => route('auctions.live-state', $auction),
+                'live_status'=> route('auctions.live-status', $auction),
+                'sell'       => route('auctions.sell', $auction),
+                'end'        => route('auctions.end-broadcast', $auction),
+                'show'       => route('auctions.show', $auction),
+            ],
+            'livekit_url' => config('services.livekit.url'),
+        ]);
     }
 
     /**

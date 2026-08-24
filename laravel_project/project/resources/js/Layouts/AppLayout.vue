@@ -216,10 +216,19 @@ onUnmounted(() => {
 
                         <template v-if="user">
                             <template v-if="user.is_seller">
-                                <Link :href="route('seller.auctions.create')" class="btn btn-primary btn-sm modern-btn d-none d-lg-inline-flex align-items-center">
-                                    <i class="bi bi-plus-lg me-1 d-flex"></i><span>İlan Ver</span>
-                                </Link>
-                                <Link :href="route('seller.auctions.create')" class="btn modern-icon d-flex d-lg-none" style="color:#155eef">
+                                <div class="dropdown d-none d-md-block me-1">
+                                    <button class="btn btn-primary btn-sm modern-btn d-inline-flex align-items-center" data-bs-toggle="dropdown" data-testid="seller-actions-toggle">
+                                        <i class="bi bi-plus-lg me-1 d-flex"></i><span>Satıcı</span><i class="bi bi-chevron-down ms-1 small"></i>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end shadow">
+                                        <li><Link class="dropdown-item d-flex align-items-center gap-2" :href="route('seller.auctions.create')" data-testid="seller-action-create"><i class="bi bi-plus-lg"></i>İlan Ver</Link></li>
+                                        <li><Link class="dropdown-item d-flex align-items-center gap-2" :href="route('seller.auctions.index')"><i class="bi bi-hammer"></i>İlanlarım</Link></li>
+                                        <li><Link class="dropdown-item d-flex align-items-center gap-2" :href="route('seller.sales.index')"><i class="bi bi-box-seam"></i>Satışlarım</Link></li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li><Link class="dropdown-item d-flex align-items-center gap-2" :href="route('seller.dashboard')"><i class="bi bi-broadcast text-danger"></i>Canlıya Başla</Link></li>
+                                    </ul>
+                                </div>
+                                <Link :href="route('seller.auctions.create')" class="btn modern-icon d-flex d-md-none" style="color:#155eef" title="İlan Ver">
                                     <i class="bi bi-plus-lg fs-5"></i>
                                 </Link>
                             </template>

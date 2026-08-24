@@ -29,7 +29,7 @@ function loadScript(src) {
 
 async function boot() {
     // Mobil/masaüstü: ilan detayına girince sayfa en üstten açılmalı
-    try { window.scrollTo({ top: 0, left: 0 }); } catch (e) { window.scrollTo(0, 0); }
+    scrollTopHard();
     await nextTick();
     // config.js bir IIFE — her mount'ta güvenle yeniden çalışıp window.* değerlerini tazeler
     await loadScript('/assets/js/custom/auctions-new-config.js');
@@ -39,6 +39,22 @@ async function boot() {
     } else {
         await loadScript('/assets/js/custom/auction-show.js');
     }
+    // Scriptler yüklendikten/DOM oturduktan sonra tekrar en üste sabitle
+    scrollTopHard();
+    requestAnimationFrame(scrollTopHard);
+    setTimeout(scrollTopHard, 120);
+    setTimeout(scrollTopHard, 350);
+}
+
+function scrollTopHard() {
+    try { window.scrollTo({ top: 0, left: 0 }); } catch (e) { window.scrollTo(0, 0); }
+    if (document.scrollingElement) document.scrollingElement.scrollTop = 0;
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+    ['#kt_app_main', '.app-main', '#kt_app_content', '.app-content'].forEach((sel) => {
+        const el = document.querySelector(sel);
+        if (el) el.scrollTop = 0;
+    });
 }
 
 onMounted(boot);
