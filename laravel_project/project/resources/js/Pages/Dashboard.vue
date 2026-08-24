@@ -69,7 +69,7 @@ function badge(status) {
                                 <td>
                                     <div class="dash-item">
                                         <img class="a-avatar" :src="bid.cover_url" alt="">
-                                        <a class="dash-item-title" :href="bid.show_url">{{ bid.title }}</a>
+                                        <Link class="dash-item-title" :href="bid.show_url">{{ bid.title }}</Link>
                                     </div>
                                 </td>
                                 <td class="dash-amount">{{ bid.amount }}</td>
@@ -92,13 +92,13 @@ function badge(status) {
                     <div class="pf-empty-sub">Beğendiğin ilanları favorilere ekle.</div>
                 </div>
                 <div v-else class="dash-fav-grid">
-                    <a v-for="w in watchItems" :key="w.show_url" class="dash-fav-card" :href="w.show_url">
+                    <Link v-for="w in watchItems" :key="w.show_url" class="dash-fav-card" :href="w.show_url">
                         <img :src="w.cover_url" :alt="w.title">
                         <div class="dash-fav-body">
                             <div class="dash-fav-title">{{ w.title }}</div>
                             <div class="dash-fav-price">{{ w.display_price }}</div>
                         </div>
-                    </a>
+                    </Link>
                 </div>
             </div>
         </div>

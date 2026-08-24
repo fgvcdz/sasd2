@@ -339,3 +339,8 @@ Kullanıcı isteği: Users index'te "Kullanıcı Ekle" butonu yoktu (Blade'de + 
 ## 🩹 Bug Fix Turu 2 (kullanıcı geri bildirimi) — TAMAM ✅ (testing agent %100, iteration_3)
 - **Dark mode native select okunabilirliği (KÖK ÇÖZÜM):** İlk düzeltmede `option` arkaplanı `var(--card)` idi; dark modda `--card` YARI SAYDAM (rgba) olduğundan native açılır listede beyaz görünüyordu. Çözüm: `admin-fixes.css`'te `select{color-scheme:dark}` + `html.light-mode select{color-scheme:light}` + `option{background:var(--bg);color:var(--text)}` (var(--bg) her iki modda da SOLID: #0b0d14 / #f4f6fb). Tüm admin CRUD selectlerinde (auction edit condition/status, support filtre, settings) seçenekler artık okunur.
 - **Admin İlan Göster derli toplu + ikon:** başlık artık kart tarzı header (`.au-show-head`) + solu mavi gradyan ikon rozeti (`.au-show-icon` içinde bi-box-seam) + durum rozeti başlığın yanında; görsel kartı sadeleştirildi.
+
+## 🔗 SPA Link Denetimi — TAMAM ✅ (testing agent %100, iteration_5, 7/7 çalıştırılabilir PASS)
+Dönüştürülmüş Inertia sayfalarına giden ama tam sayfa yenileyen `<a :href>` linkleri `<Link>`'e çevrildi:
+Admin/Dashboard (4 hızlı işlem + "Tümü"), Admin/Auctions/Show (satıcı oku), Admin/Categories/Index+Show (Yeni/Alt Kategori), Dashboard (teklif başlığı + favori kartı), Buyer/Favorites, Buyer/MyBids, Messages/Index (peer adı), Profile/Show (İlan Oluştur).
+Bilerek `<a>` kalanlar: Canlı Yayın (broadcast_url — GRUP 3 hâlâ Blade), Google OAuth, Auth login/register çapraz linkleri, AppLayout arama dropdown & hash linkleri.

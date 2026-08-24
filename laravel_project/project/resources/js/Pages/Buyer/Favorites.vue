@@ -28,13 +28,13 @@ defineProps({ items: Object });
             </div>
             <template v-else>
                 <div class="dash-fav-grid">
-                    <a v-for="w in items.data" :key="w.show_url" class="dash-fav-card" :href="w.show_url">
+                    <Link v-for="w in items.data" :key="w.show_url" class="dash-fav-card" :href="w.show_url">
                         <img :src="w.cover_url" :alt="w.title">
                         <div class="dash-fav-body">
                             <div class="dash-fav-title">{{ w.title }}</div>
                             <div class="dash-fav-price">{{ w.display_price }}</div>
                         </div>
-                    </a>
+                    </Link>
                 </div>
                 <Pagination v-if="items.has_pages" :links="items.links" />
             </template>

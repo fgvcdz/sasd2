@@ -438,7 +438,7 @@ onMounted(boot);
                         <template v-else>Bu kullanıcı henüz ilan yayınlamamış.</template>
                     </div>
                     <template v-if="pf.is_owner">
-                        <a v-if="pf.is_creator_seller" :href="pf.urls.seller_create" class="pf-btn-save mt-3 d-inline-flex align-items-center gap-1"><i class="bi bi-plus-lg"></i> İlan Oluştur</a>
+                        <Link v-if="pf.is_creator_seller" :href="pf.urls.seller_create" class="pf-btn-save mt-3 d-inline-flex align-items-center gap-1"><i class="bi bi-plus-lg"></i> İlan Oluştur</Link>
                         <Link v-else :href="pf.urls.browse" class="pf-btn-save mt-3 d-inline-flex align-items-center gap-1"><i class="bi bi-search"></i> Müzayedeleri Keşfet</Link>
                     </template>
                 </div>

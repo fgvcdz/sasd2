@@ -211,7 +211,7 @@ const nextLink = computed(() => props.categories.links[props.categories.links.le
                                     <div class="pf-empty-icon"><i class="bi bi-grid-3x3-gap-fill"></i></div>
                                     <div class="pf-empty-title">Kategori bulunamadı</div>
                                     <div class="pf-empty-sub">Filtreni değiştir veya yeni kategori oluştur.</div>
-                                    <a :href="create_url" class="pf-btn-save mt-3 pf-btn-with-icon d-inline-flex"><i class="bi bi-plus-lg"></i> Yeni Kategori</a>                                </div>
+                                    <Link :href="create_url" class="pf-btn-save mt-3 pf-btn-with-icon d-inline-flex"><i class="bi bi-plus-lg"></i> Yeni Kategori</Link>                                </div>
                             </td>
                         </tr>
                     </tbody>

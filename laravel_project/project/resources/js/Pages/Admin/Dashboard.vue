@@ -109,17 +109,17 @@ function barHeight(c) {
 
             <div class="adm-card">
                 <div class="adm-card-h"><div class="adm-card-t"><i class="bi bi-lightning-charge" style="color:#fbbf24"></i> Hızlı İşlemler</div></div>
-                <a :href="links.users" class="adm-qa"><i class="bi bi-people lead" style="color:#3b82f6"></i><div style="flex:1"><div class="adm-qa-t">Kullanıcılar</div><div class="adm-qa-s">Üye yönetimi &amp; roller</div></div><i class="bi bi-chevron-right" style="color:var(--muted)"></i></a>
-                <a :href="links.auctions" class="adm-qa"><i class="bi bi-hammer lead" style="color:#10b981"></i><div style="flex:1"><div class="adm-qa-t">Müzayedeler</div><div class="adm-qa-s">İlan &amp; teklif yönetimi</div></div><i class="bi bi-chevron-right" style="color:var(--muted)"></i></a>
-                <a :href="links.disputes" class="adm-qa" data-testid="qa-disputes"><i class="bi bi-exclamation-octagon lead" style="color:#ef4444"></i><div style="flex:1"><div class="adm-qa-t">Anlaşmazlıklar</div><div class="adm-qa-s">{{ stats.disputes }} bekleyen çözüm</div></div><i class="bi bi-chevron-right" style="color:var(--muted)"></i></a>
-                <a :href="links.orders" class="adm-qa"><i class="bi bi-box-seam lead" style="color:#8b5cf6"></i><div style="flex:1"><div class="adm-qa-t">Siparişler</div><div class="adm-qa-s">Tüm sipariş takibi</div></div><i class="bi bi-chevron-right" style="color:var(--muted)"></i></a>
+                <Link :href="links.users" class="adm-qa"><i class="bi bi-people lead" style="color:#3b82f6"></i><div style="flex:1"><div class="adm-qa-t">Kullanıcılar</div><div class="adm-qa-s">Üye yönetimi &amp; roller</div></div><i class="bi bi-chevron-right" style="color:var(--muted)"></i></Link>
+                <Link :href="links.auctions" class="adm-qa"><i class="bi bi-hammer lead" style="color:#10b981"></i><div style="flex:1"><div class="adm-qa-t">Müzayedeler</div><div class="adm-qa-s">İlan &amp; teklif yönetimi</div></div><i class="bi bi-chevron-right" style="color:var(--muted)"></i></Link>
+                <Link :href="links.disputes" class="adm-qa" data-testid="qa-disputes"><i class="bi bi-exclamation-octagon lead" style="color:#ef4444"></i><div style="flex:1"><div class="adm-qa-t">Anlaşmazlıklar</div><div class="adm-qa-s">{{ stats.disputes }} bekleyen çözüm</div></div><i class="bi bi-chevron-right" style="color:var(--muted)"></i></Link>
+                <Link :href="links.orders" class="adm-qa"><i class="bi bi-box-seam lead" style="color:#8b5cf6"></i><div style="flex:1"><div class="adm-qa-t">Siparişler</div><div class="adm-qa-s">Tüm sipariş takibi</div></div><i class="bi bi-chevron-right" style="color:var(--muted)"></i></Link>
                 <Link :href="links.categories" class="adm-qa"><i class="bi bi-diagram-3 lead" style="color:#06b6d4"></i><div style="flex:1"><div class="adm-qa-t">Kategoriler</div><div class="adm-qa-s">İç içe kategori yönetimi</div></div><i class="bi bi-chevron-right" style="color:var(--muted)"></i></Link>
             </div>
         </div>
 
         <div class="adm-2col-b">
             <div class="adm-card" data-testid="admin-recent-orders">
-                <div class="adm-card-h"><div class="adm-card-t"><i class="bi bi-clock-history" style="color:var(--primary)"></i> Son Siparişler</div><a :href="links.orders" style="font-size:12px;color:var(--primary);text-decoration:none">Tümü →</a></div>
+                <div class="adm-card-h"><div class="adm-card-t"><i class="bi bi-clock-history" style="color:var(--primary)"></i> Son Siparişler</div><Link :href="links.orders" style="font-size:12px;color:var(--primary);text-decoration:none">Tümü →</Link></div>
                 <template v-if="recentOrders.length">
                     <div v-for="(o, i) in recentOrders" :key="i" class="adm-list-row">
                         <img class="adm-ava" :src="o.cover" alt="">

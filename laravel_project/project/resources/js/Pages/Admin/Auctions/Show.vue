@@ -116,7 +116,7 @@ function del() {
                             <div v-else class="bg-primary text-white fw-bold d-flex align-items-center justify-content-center w-100 h-100">{{ a.seller.initial }}</div>
                         </div>
                         <div><div style="font-weight:600;font-size:14px;">{{ a.seller.name }}</div><div style="font-size:12px;opacity:.5;">{{ a.seller.email }}</div></div>
-                        <a :href="a.seller.url" class="pf-btn-icon ms-auto" title="Kullanıcıya git"><i class="bi bi-arrow-right"></i></a>
+                        <Link :href="a.seller.url" class="pf-btn-icon ms-auto" title="Kullanıcıya git"><i class="bi bi-arrow-right"></i></Link>
                     </div>
                 </div>
 

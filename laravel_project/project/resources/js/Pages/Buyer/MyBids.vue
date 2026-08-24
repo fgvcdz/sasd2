@@ -41,7 +41,7 @@ function badge(status) {
                                 <td>
                                     <div class="dash-item">
                                         <img class="a-avatar" :src="bid.cover_url" alt="">
-                                        <a class="dash-item-title" :href="bid.show_url">{{ bid.title }}</a>
+                                        <Link class="dash-item-title" :href="bid.show_url">{{ bid.title }}</Link>
                                     </div>
                                 </td>
                                 <td class="dash-amount">{{ bid.amount }}</td>

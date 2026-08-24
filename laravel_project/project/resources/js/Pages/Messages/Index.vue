@@ -111,7 +111,7 @@ onBeforeUnmount(() => {
                         <Link :href="index_url" class="msg-back" data-testid="messages-back"><i class="bi bi-arrow-left"></i></Link>
                         <img class="msg-avatar" :src="active.peer_avatar" :alt="active.peer_name">
                         <div>
-                            <a :href="active.profile_url" class="msg-chat-name">{{ active.peer_name }}</a>
+                            <Link :href="active.profile_url" class="msg-chat-name">{{ active.peer_name }}</Link>
                             <div class="msg-chat-sub">{{ '@' + active.peer_username }}</div>
                         </div>
                     </div>

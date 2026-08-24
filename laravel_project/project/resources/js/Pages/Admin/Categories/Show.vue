@@ -157,7 +157,7 @@ function del() {
                     <div class="pf-empty-icon"><i class="bi bi-folder2"></i></div>
                     <div class="pf-empty-title">Alt kategori yok</div>
                     <div class="pf-empty-sub">Bu kategoriye alt kategori ekleyebilirsin.</div>
-                    <a :href="c.create_child_url" class="pf-btn-save mt-3 d-inline-flex align-items-center gap-1"><i class="bi bi-plus-lg"></i> Alt Kategori Ekle</a>
+                    <Link :href="c.create_child_url" class="pf-btn-save mt-3 d-inline-flex align-items-center gap-1"><i class="bi bi-plus-lg"></i> Alt Kategori Ekle</Link>
                 </div>
             </div>
 
