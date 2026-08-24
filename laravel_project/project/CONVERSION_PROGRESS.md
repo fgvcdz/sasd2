@@ -359,3 +359,8 @@ Bilerek `<a>` kalanlar: Canlı Yayın (broadcast_url — GRUP 3 hâlâ Blade), G
 - **Mesaj gönderilemiyordu (419 CSRF):** SPA'da `<meta csrf-token>` login sonrası bayatlıyordu. `resources/js/csrf.js` eklendi → `XSRF-TOKEN` cookie'sinden `X-XSRF-TOKEN` (her yanıtta taze). Messages/Index send() ve StoryViewer delete bunu kullanıyor. Bildirim `<Link>`'ine de `route('notifications.index')` fallback eklendi (iteration_8).
 - **Story kullanıcı profil linki:** Görüntüleyici başlığındaki ad/avatar tıklanınca kullanıcının profiline SPA geçiş (payload'a `profile_url` eklendi).
 - **Story silme modalı arkada açılıyordu:** `.swal2-container{z-index:100000}` (story-viewer 20000 idi) → SweetAlert artık üstte; silme sırasında ilerleme duraklıyor, iptal edilince devam ediyor.
+
+## 🩹 Bug Fix Turu 4 — CSRF/419 kesin çözüm (testing agent %100, iteration_10)
+- **Sorun:** Mesaj ilk denemede gönderilemiyor, "bir kez yenileyince" çalışıyordu. Kök neden: SPA'da `<meta csrf-token>` (ve fallback'ler) login/gezinti sonrası bayat → POST 419.
+- **Çözüm:** `HandleInertiaRequests` artık her yanıtta taze `csrf_token` prop'u paylaşıyor; `AppLayout` her `router.on('success')`'te `<meta>`'yı ve `axios` default header'ını güncelliyor; `Messages/Index send()` doğrudan `page.props.csrf_token`'ı `X-CSRF-TOKEN` olarak gönderiyor. `csrf.js` öncelik: explicit token > XSRF cookie > meta.
+- Doğrulama: ilk-deneme SPA mesaj POST 200, yenileme sonrası 200, admin destek yanıtı 200, story silme CSRF hatasız.

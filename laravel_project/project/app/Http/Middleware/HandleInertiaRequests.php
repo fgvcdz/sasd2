@@ -41,6 +41,7 @@ class HandleInertiaRequests extends Middleware
                 ] : null,
             ],
             'headerNotifications' => $user ? $this->headerNotifications($user) : [],
+            'csrf_token' => csrf_token(),
             'flash' => [
                 'success' => fn () => $request->session()->get('success'),
                 'error'   => fn () => $request->session()->get('error'),

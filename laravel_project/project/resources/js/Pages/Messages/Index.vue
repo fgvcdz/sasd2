@@ -4,9 +4,11 @@ export default { layout: AppLayout };
 </script>
 
 <script setup>
-import { Head, Link } from '@inertiajs/vue3';
+import { Head, Link, usePage } from '@inertiajs/vue3';
 import { ref, reactive, nextTick, onMounted, onBeforeUnmount } from 'vue';
 import { csrfHeaders } from '@/csrf';
+
+const page = usePage();
 
 const props = defineProps({
     conversations: Array,
@@ -44,7 +46,7 @@ function send() {
     input.value = '';
     fetch(props.active.store_url, {
         method: 'POST',
-        headers: csrfHeaders({ 'Content-Type': 'application/json' }),
+        headers: csrfHeaders({ 'Content-Type': 'application/json' }, page.props.csrf_token),
         credentials: 'same-origin',
         body: JSON.stringify({ body }),
     })

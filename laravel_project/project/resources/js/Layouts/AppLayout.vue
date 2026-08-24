@@ -127,6 +127,20 @@ function closeMobileSidebar() {
     } catch (e) { /* noop */ }
 }
 let removeNavListener = null;
+let removeCsrfListener = null;
+
+function syncCsrfMeta() {
+    const t = page.props.csrf_token;
+    if (!t) return;
+    let meta = document.querySelector('meta[name="csrf-token"]');
+    if (!meta) {
+        meta = document.createElement('meta');
+        meta.setAttribute('name', 'csrf-token');
+        document.head.appendChild(meta);
+    }
+    meta.setAttribute('content', t);
+    if (window.axios) window.axios.defaults.headers.common['X-CSRF-TOKEN'] = t;
+}
 
 onMounted(() => {
     applyTheme(localStorage.getItem('theme') || 'dark');
@@ -136,12 +150,16 @@ onMounted(() => {
     document.body.classList.remove('auth-page');
     document.addEventListener('click', onClickOutside);
     removeNavListener = router.on('start', () => closeMobileSidebar());
+    // Her Inertia gezintisinden sonra CSRF token'ını taze tut (SPA'da meta bayatlıyordu → 419)
+    syncCsrfMeta();
+    removeCsrfListener = router.on('success', () => syncCsrfMeta());
     nextTick(() => window.initKT && window.initKT());
 });
 
 onUnmounted(() => {
     document.removeEventListener('click', onClickOutside);
     if (removeNavListener) removeNavListener();
+    if (removeCsrfListener) removeCsrfListener();
 });
 </script>
 
